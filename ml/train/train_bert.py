@@ -42,27 +42,63 @@ print(">>> Running on:", device)
 
 
 # ==========================================================
-# LOAD DATASET
+# LOAD DATASET (FIXED)
 # ==========================================================
 def load_dataset():
     train = pd.read_csv(train_csv)
     test = pd.read_csv(test_csv)
 
-    # Normalisasi label menjadi 0–2
-    if train["sentiment"].min() == 1:
-        print(">>> Normalisasi label dari {1,2,3} menjadi {0,1,2}")
-        mapping = {1: 0, 2: 1, 3: 2}
-        train["sentiment"] = train["sentiment"].map(mapping)
-        test["sentiment"] = test["sentiment"].map(mapping)
+    print(">>> Train columns:", list(train.columns))
+
+    # ======================================================
+    # AUTO DETECT LABEL COLUMN
+    # ======================================================
+    possible_label_cols = ["sentiment", "Sentiment", "label", "Label"]
+    label_col = next((c for c in possible_label_cols if c in train.columns), None)
+
+    if label_col is None:
+        raise ValueError("Kolom label tidak ditemukan di train.csv")
 
     text_col = "clean_text"
-    label_col = "sentiment"
 
+    print(f">>> Text column  : {text_col}")
+    print(f">>> Label column : {label_col}")
+
+    # ======================================================
+    # NORMALISASI LABEL KE 0–2
+    # ======================================================
+    unique_labels = sorted(train[label_col].unique())
+    print(">>> Unique labels before:", unique_labels)
+
+    # {-1, 0, 1} → {0, 1, 2}
+    if set(unique_labels) == {-1, 0, 1}:
+        mapping = {-1: 0, 0: 1, 1: 2}
+        train[label_col] = train[label_col].map(mapping)
+        test[label_col] = test[label_col].map(mapping)
+        print(">>> Label mapped {-1,0,1} → {0,1,2}")
+
+    # {1, 2, 3} → {0, 1, 2}
+    elif set(unique_labels) == {1, 2, 3}:
+        mapping = {1: 0, 2: 1, 3: 2}
+        train[label_col] = train[label_col].map(mapping)
+        test[label_col] = test[label_col].map(mapping)
+        print(">>> Label mapped {1,2,3} → {0,1,2}")
+
+    print(">>> Unique labels after:", sorted(train[label_col].unique()))
+
+    # ======================================================
+    # CONVERT TO HUGGINGFACE DATASET
+    # ======================================================
     train_ds = Dataset.from_pandas(
-        train[[text_col, label_col]].rename(columns={text_col: "text", label_col: "label"})
+        train[[text_col, label_col]].rename(
+            columns={text_col: "text", label_col: "label"}
+        )
     )
+
     test_ds = Dataset.from_pandas(
-        test[[text_col, label_col]].rename(columns={text_col: "text", label_col: "label"})
+        test[[text_col, label_col]].rename(
+            columns={text_col: "text", label_col: "label"}
+        )
     )
 
     return DatasetDict({"train": train_ds, "test": test_ds})
@@ -103,7 +139,13 @@ def compute_metrics(eval_pred):
 # PREDICT FUNCTION
 # ==========================================================
 def predict_text(model, tokenizer, text):
-    inputs = tokenizer(text, return_tensors="pt", truncation=True, padding=True, max_length=MAX_LEN)
+    inputs = tokenizer(
+        text,
+        return_tensors="pt",
+        truncation=True,
+        padding=True,
+        max_length=MAX_LEN
+    )
     inputs = {k: v.to(device) for k, v in inputs.items()}
 
     with torch.no_grad():
@@ -118,13 +160,11 @@ def predict_text(model, tokenizer, text):
 # MAIN
 # ==========================================================
 def main():
-    # Load dataset
     ds = load_dataset()
 
     tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
     ds = ds.map(lambda x: tokenize(x, tokenizer), batched=True)
 
-    # KEEP ONLY NECESSARY COLUMNS
     keep = ["input_ids", "attention_mask", "label"]
     if "token_type_ids" in ds["train"].column_names:
         keep.append("token_type_ids")
@@ -132,15 +172,11 @@ def main():
     ds = ds.remove_columns([c for c in ds["train"].column_names if c not in keep])
     ds.set_format("torch")
 
-    # Load IndoBERT
     model = AutoModelForSequenceClassification.from_pretrained(
         MODEL_NAME,
         num_labels=3
     ).to(device)
 
-    # ======================================================
-    # MODERN TRANSFORMERS (v4.57.3)
-    # ======================================================
     args = TrainingArguments(
         output_dir=MODEL_OUTPUT_DIR,
         num_train_epochs=EPOCHS,
@@ -150,7 +186,6 @@ def main():
         weight_decay=0.01,
         fp16=torch.cuda.is_available(),
 
-        # Modern replacements:
         eval_strategy="epoch",
         save_strategy="epoch",
         logging_strategy="steps",
@@ -175,11 +210,9 @@ def main():
     print("====================")
     print(trainer.evaluate())
 
-    # Save model
     trainer.save_model(MODEL_OUTPUT_DIR)
     tokenizer.save_pretrained(MODEL_OUTPUT_DIR)
 
-    # Sample prediction
     print("\n=========== SAMPLE PREDICTION ===========")
     samples = [
         "pemerintah menyusahkan rakyat",
