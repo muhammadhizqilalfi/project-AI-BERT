@@ -104,28 +104,6 @@ Model terbaik disimpan dan digunakan untuk prediksi serta deployment.
 
 ---
 
-## ▶️ Contoh Demo
-
-Contoh request ke API:
-
-```json
-POST /predict
-{
-  "text": "Pelayanan aplikasi ini sangat membantu"
-}
-```
-
-Contoh response:
-
-```json
-{
-  "label": "positif",
-  "confidence": 0.87
-}
-```
-
----
-
 ## 🔗 Link Terkait
 
 * Dataset: https://github.com/rizalespe/Dataset-Sentimen-Analisis-Bahasa-Indonesia
