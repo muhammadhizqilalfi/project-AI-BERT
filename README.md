@@ -94,7 +94,8 @@ Model terbaik disimpan dan digunakan untuk prediksi serta deployment.
 ## 🖼️ Gambar Web
 
 ```md
-![Tampilan Web](assets/web-preview.jpeg)
+![Tampilan Web](https://raw.githubusercontent.com/muhammadhizqilalfi/project-AI-BERT/master/assets/web-preview.jpeg)
+
 ```
 
 ---
