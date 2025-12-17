@@ -93,10 +93,14 @@ Model terbaik disimpan dan digunakan untuk prediksi serta deployment.
 
 ## 🖼️ Gambar Web
 
-```md
-![Tampilan Web](https://raw.githubusercontent.com/muhammadhizqilalfi/project-AI-BERT/master/assets/web-preview.jpeg)
-
-```
+<p align="center">
+  <img 
+    src="https://raw.githubusercontent.com/muhammadhizqilalfi/project-AI-BERT/master/assets/web-preview.jpeg"
+    width="700"
+  />
+  <br>
+  <i>Tampilan Web Sentiment Analyzer</i>
+</p>
 
 ---
 
