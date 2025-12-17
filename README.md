@@ -36,7 +36,7 @@ Model mengklasifikasikan teks ke dalam tiga label berikut:
 * Format: **CSV**
 * Sumber dataset: Repository publik GitHub
 
-🔗 Link Dataset:
+🔗 Link Dataset: https://github.com/rizalespe/Dataset-Sentimen-Analisis-Bahasa-Indonesia
 
 
 ---
@@ -94,7 +94,7 @@ Model terbaik disimpan dan digunakan untuk prediksi serta deployment.
 ## 🖼️ Gambar Web
 
 ```md
-![Tampilan Web](assets/web-preview.png)
+![Tampilan Web](assets/web-preview.jpeg)
 ```
 
 ---
@@ -123,10 +123,10 @@ Contoh response:
 
 ## 🔗 Link Terkait
 
-* Dataset: 
-* Repository GitHub: 
-* Demo Web: 
-* API Endpoint: 
+* Dataset: https://github.com/rizalespe/Dataset-Sentimen-Analisis-Bahasa-Indonesia
+* Repository GitHub: https://github.com/muhammadhizqilalfi/project-AI-BERT
+* Vercel (FrontEnd): https://vercel.com/alfihzqls-projects/bert-sentiment-analysis 
+* Huggingface space (BackEnd + Model): https://huggingface.co/spaces/arufii12/api-bert 
 
 ---
 
