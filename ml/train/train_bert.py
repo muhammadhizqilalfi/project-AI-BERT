@@ -10,6 +10,9 @@ from transformers import (
 )
 import numpy as np
 import evaluate
+from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay
+import matplotlib.pyplot as plt
+
 
 # ==========================================================
 # PATH HANDLING
@@ -210,6 +213,26 @@ def main():
     print("====================")
     print(trainer.evaluate())
 
+    print("\n====================")
+    print(" CONFUSION MATRIX")
+    print("====================")
+
+    preds = trainer.predict(ds["test"])
+
+    y_true = preds.label_ids
+    y_pred = np.argmax(preds.predictions, axis=1)
+
+    cm = confusion_matrix(y_true, y_pred)
+    disp = ConfusionMatrixDisplay(
+        confusion_matrix=cm,
+        display_labels=["Negatif", "Netral", "Positif"]
+    )
+
+    disp.plot(cmap="Blues")
+    plt.title("Confusion Matrix - IndoBERT")
+    plt.show()
+
+
     trainer.save_model(MODEL_OUTPUT_DIR)
     tokenizer.save_pretrained(MODEL_OUTPUT_DIR)
 
@@ -224,6 +247,7 @@ def main():
     for s in samples:
         print(s, " => ", predict_text(model, tokenizer, s))
 
+    
     print("\n>>> Model saved in:", MODEL_OUTPUT_DIR)
 
 
