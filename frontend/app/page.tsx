@@ -28,7 +28,7 @@ export default function HomePage() {
     }
 
     try {
-      const res = await fetch("http://localhost:8000/predict", {
+      const res = await fetch("https://arufii12-api-bert.hf.space/predict", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
